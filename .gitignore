@@ -99,8 +99,6 @@ desktop.ini
 # --- Claude Code (local only) ---
 .claude/settings.local.json
 
-# --- Lokalne skrypty pomocnicze ---
-setup.bat
+# --- Logi skryptow pomocniczych ---
 setup_log.txt
-check.bat
 check_log.txt
