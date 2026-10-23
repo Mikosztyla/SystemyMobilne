@@ -2,6 +2,15 @@
 
 Proponowany projekt to aplikacja mobilna usprawniająca organizację życia codziennego w bursie, w której mieszkam. Aplikacja będzie gromadzić najważniejsze informacje w jednym miejscu, ułatwiając mieszkankom dostęp do aktualnych wydarzeń, harmonogramu dyżurów oraz informacji dotyczących korzystania z pralni.
 
+## Autorzy
+Mikołaj Gosztyła, Magdalena Pabisz
+
+## Status prac (23.10)
+- Konfiguracja bazy danych Firebase
+- Przygotowanie środowiska programistycznego
+- Ustalenie planu prac i podziału zadań
+- Omówienie wyglądu i koncepcji wizualnej aplikacji
+
 ## Główne funkcjonalności
 
 - **Kalendarium wydarzeń** – wyświetlanie najważniejszych wydarzeń, takich jak spotkania organizacyjne, msze święte czy terminy zbiórek opłat.
