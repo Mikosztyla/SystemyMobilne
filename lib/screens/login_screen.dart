@@ -1,3 +1,4 @@
+import 'package:bursa_app/screens/home_shell.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:bursa_app/screens/utils/validators.dart';
 
@@ -143,13 +144,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         SizedBox(height: 32),
                         FilledButton(
                           onPressed: _isLoading ? null : _login,
-                          style: FilledButton.styleFrom(
-                            minimumSize: const Size.fromHeight(52),
-                            textStyle: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
                           child: _isLoading
                               ? Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -231,5 +225,15 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _isLoading = false;
     });
+
+    if (_errorMessage == null) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) {
+            return HomeShell();
+          },
+        ),
+      );
+    }
   }
 }
