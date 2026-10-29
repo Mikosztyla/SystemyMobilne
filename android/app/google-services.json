@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "859493469284",
+    "project_id": "bursaapp-38e6d",
+    "storage_bucket": "bursaapp-38e6d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859493469284:android:2185f21b14ccb494566371",
+        "android_client_info": {
+          "package_name": "pl.edu.agh.bursa_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxihmE47x_Pv6Vu1IkCZQarK--pC1OnTg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

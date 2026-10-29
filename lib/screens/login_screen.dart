@@ -1,4 +1,5 @@
 import 'package:bursa_app/screens/home_shell.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:bursa_app/screens/utils/validators.dart';
 
@@ -210,14 +211,22 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = true;
     });
 
-    // TODO: real logging logic
-    await Future.delayed(const Duration(seconds: 2)); // mock logging
-
-    // TODO: real logging status
-    if (_passwordController.text != "admin") {
-      // mock password check
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+    } on FirebaseAuthException catch (e) {
       setState(() {
-        _errorMessage = "Nieprawidłowy e-mail lub hasło";
+        _errorMessage = switch (e.code) {
+          'invalid-credential' ||
+          'wrong-password' ||
+          'user-not-found' => 'Nieprawidłowy e-mail lub hasło',
+          'invalid-email' => 'Nieprawidłowy adres e-mail',
+          'too-many-requests' => 'Zbyt wiele prób. Spróbuj za chwilę',
+          'network-request-failed' => 'Brak połączenia z internetem',
+          _ => 'Błąd logowania (${e.code})',
+        };
       });
     }
     if (!mounted) return;
