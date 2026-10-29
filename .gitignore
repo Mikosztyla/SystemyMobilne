@@ -97,7 +97,7 @@ desktop.ini
 *.log
 
 # --- Claude Code (local only) ---
-.claude/settings.local.json
+.claude/
 
 # --- Logi skryptow pomocniczych ---
 setup_log.txt
