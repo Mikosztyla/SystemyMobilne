@@ -5,6 +5,11 @@ Proponowany projekt to aplikacja mobilna usprawniająca organizację życia codz
 ## Autorzy
 Mikołaj Gosztyła, Magdalena Pabisz
 
+## Status prac (30.10)
+- Połączenie z bazą danych
+- Mechanizm logowania
+- Pasek nawigacji
+  
 ## Status prac (23.10)
 - Konfiguracja bazy danych Firebase
 - Przygotowanie środowiska programistycznego
