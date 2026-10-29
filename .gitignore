@@ -96,9 +96,6 @@ Thumbs.db
 desktop.ini
 *.log
 
-# --- Claude Code (local only) ---
-.claude/settings.local.json
-
 # --- Logi skryptow pomocniczych ---
 setup_log.txt
 check_log.txt
