@@ -1,3 +1,4 @@
+import 'package:bursa_app/models/firestore_collections.dart';
 import 'package:bursa_app/screens/login_screen.dart';
 import 'package:bursa_app/screens/profile/admin_panel_button.dart';
 import 'package:bursa_app/screens/profile/profile_header.dart';
@@ -19,7 +20,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  Map<String, bool> _notifications = Map();
+  final Map<String, bool> _notifications = Map();
   late final Future<AppUser> _userFuture;
 
   @override
@@ -86,19 +87,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     icon: Icons.cleaning_services_outlined,
                     title: "Przypomnienia o dyżurach",
                     subtitle: "Twój dyżur na ten tydzień",
-                    value: _notifications["notifyDuties"]!,
+                    value: _notifications[UserFields.notifyDuties]!,
                     onChanged: (bool value) {
-                      _onSwitchChanged(value, "notifyDuties");
+                      _onSwitchChanged(value, UserFields.notifyDuties);
                     },
                   ),
                   SwitchTile(
                     icon: Icons.local_laundry_service_outlined,
                     title: "Koniec prania",
                     subtitle: "Gdy minie czas programu",
-                    value: _notifications["notifyLaundry"]!,
+                    value: _notifications[UserFields.notifyLaundry]!,
                     onChanged: (bool value) {
                       setState(() {
-                        _onSwitchChanged(value, "notifyLaundry");
+                        _onSwitchChanged(value, UserFields.notifyLaundry);
                       });
                     },
                   ),
@@ -151,7 +152,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
     final doc = await FirebaseFirestore.instance
-        .collection('users')
+        .collection(FirestoreCollections.users)
         .doc(uid)
         .get();
 
@@ -160,8 +161,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       FirebaseAuth.instance.currentUser!.email!,
     );
 
-    _notifications["notifyDuties"] = user.notifyDuties;
-    _notifications["notifyLaundry"] = user.notifyLaundry;
+    _notifications[UserFields.notifyDuties] = user.notifyDuties;
+    _notifications[UserFields.notifyLaundry] = user.notifyLaundry;
 
     return user;
   }
@@ -173,9 +174,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     try {
       final uid = FirebaseAuth.instance.currentUser!.uid;
-      await FirebaseFirestore.instance.collection('users').doc(uid).update({
-        name: value,
-      });
+      await FirebaseFirestore.instance
+          .collection(FirestoreCollections.users)
+          .doc(uid)
+          .update({name: value});
     } catch (e) {
       if (!mounted) return;
       setState(() {
