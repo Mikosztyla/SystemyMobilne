@@ -1,5 +1,3 @@
-import 'package:bursa_app/screens/event_screen.dart';
-import 'package:bursa_app/screens/home_shell.dart';
 import 'package:bursa_app/screens/login_screen.dart';
 import 'package:bursa_app/theme/app_theme.dart';
 import 'package:material_ui/material_ui.dart';

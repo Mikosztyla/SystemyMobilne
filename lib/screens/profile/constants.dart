@@ -1,0 +1,1 @@
+const double iconSize = 26.0;

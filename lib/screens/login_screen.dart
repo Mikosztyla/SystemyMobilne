@@ -192,7 +192,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                if (!keyboardOpen) SizedBox(height: 16),
+                if (!keyboardOpen) SizedBox(height: 16), // TODO czy moge wywalić tego ifa?
               ],
             ],
           ),
