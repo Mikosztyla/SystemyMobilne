@@ -39,7 +39,7 @@ class EventTile extends StatelessWidget {
                   height: 50,
                   decoration: BoxDecoration(
                     color: eventColors.background,
-                    borderRadius: BorderRadius.circular(25),
+                    shape: BoxShape.circle,
                   ),
                   child: Icon(
                     event.type.icon,

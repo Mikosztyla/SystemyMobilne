@@ -1,4 +1,5 @@
 import 'package:bursa_app/models/firestore_collections.dart';
+import 'package:bursa_app/screens/events/empty_week_view.dart';
 import 'package:bursa_app/screens/events/week_panel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -72,8 +73,8 @@ class _EventScreenState extends State<EventScreen> {
                 }
 
                 if (snapshot.data!.isEmpty) {
-                  return Center(child: Text("Brak wydarzeń w tym tygodniu"));
-                  ;
+                  return  EmptyWeekView();
+
                 }
                 final events = _mapEventList(snapshot.data!);
 
