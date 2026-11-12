@@ -1,8 +1,14 @@
-import 'package:bursa_app/screens/laundry/laundry_colors.dart';
 import 'package:bursa_app/screens/laundry/machine_icon.dart';
 import 'package:material_ui/material_ui.dart';
 
 class SheetHeader extends StatelessWidget {
+  final String overline;
+  final String title;
+  final Color background;
+  final Color foreground;
+  final IconData icon;
+  final Widget? trailing;
+
   const SheetHeader({
     super.key,
     required this.overline,
@@ -13,15 +19,11 @@ class SheetHeader extends StatelessWidget {
     this.trailing,
   });
 
-  final String overline;
-  final String title;
-  final Color background;
-  final Color foreground;
-  final IconData icon;
-  final Widget? trailing;
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Row(
       children: [
         MachineIcon(
@@ -37,11 +39,15 @@ class SheetHeader extends StatelessWidget {
             children: [
               Text(
                 overline,
-                style: const TextStyle(fontSize: 13, color: LaundryColors.muted),
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
               Text(
                 title,
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+                style: textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ],
           ),

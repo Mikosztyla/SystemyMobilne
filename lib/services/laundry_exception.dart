@@ -1,7 +1,7 @@
 class LaundryException implements Exception {
-  const LaundryException(this.message);
-
   final String message;
+
+  const LaundryException(this.message);
 
   @override
   String toString() => message;

@@ -1,7 +1,10 @@
-import 'package:bursa_app/screens/laundry/laundry_colors.dart';
 import 'package:material_ui/material_ui.dart';
 
 class SheetInfoTile extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
   const SheetInfoTile({
     super.key,
     required this.icon,
@@ -9,31 +12,35 @@ class SheetInfoTile extends StatelessWidget {
     required this.value,
   });
 
-  final IconData icon;
-  final String label;
-  final String value;
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: LaundryColors.card,
+          color: colorScheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: Theme.of(context).colorScheme.primary),
+            Icon(icon, color: colorScheme.primary),
             const SizedBox(height: 6),
             Text(
               label,
-              style: const TextStyle(fontSize: 12, color: LaundryColors.muted),
+              style: textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
             Text(
               value,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              style: textTheme.titleMedium?.copyWith(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ],
         ),

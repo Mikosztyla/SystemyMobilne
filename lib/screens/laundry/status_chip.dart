@@ -1,9 +1,13 @@
 import 'package:bursa_app/models/machine.dart';
-import 'package:bursa_app/screens/laundry/laundry_colors.dart';
 import 'package:bursa_app/screens/laundry/laundry_format.dart';
+import 'package:bursa_app/screens/laundry/machine_status_colors.dart';
 import 'package:material_ui/material_ui.dart';
 
 class StatusChip extends StatelessWidget {
+  final MachineStatus status;
+  final DateTime? busyUntil;
+  final bool short;
+
   const StatusChip({
     super.key,
     required this.status,
@@ -11,22 +15,18 @@ class StatusChip extends StatelessWidget {
     this.short = false,
   });
 
-  final MachineStatus status;
-  final DateTime? busyUntil;
-
-  final bool short;
-
   @override
   Widget build(BuildContext context) {
-    final (background, foreground) = LaundryColors.forStatus(status);
-    final until = busyUntil == null ? '' : LaundryFormat.time(busyUntil!);
+    final textTheme = Theme.of(context).textTheme;
+    final (background, foreground) = status.colors(context);
+    final until = busyUntil == null ? "" : LaundryFormat.time(busyUntil!);
     final (IconData icon, String label) = switch (status) {
-      MachineStatus.free => (Icons.check_circle, 'Wolna'),
+      MachineStatus.free => (Icons.check_circle, "Wolna"),
       MachineStatus.busy => (
         Icons.hourglass_top,
-        short ? 'do $until' : 'Zajęta do $until',
+        short ? "do $until" : "Zajęta do $until",
       ),
-      MachineStatus.outOfOrder => (Icons.build, 'Awaria'),
+      MachineStatus.outOfOrder => (Icons.build, "Awaria"),
     };
 
     return Container(
@@ -43,8 +43,7 @@ class StatusChip extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 13,
+            style: textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w700,
               color: foreground,
             ),

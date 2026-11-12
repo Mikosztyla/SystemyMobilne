@@ -1,6 +1,11 @@
 import 'package:material_ui/material_ui.dart';
 
 class SheetButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback? onPressed;
+  final bool loading;
+
   const SheetButton({
     super.key,
     required this.icon,
@@ -8,11 +13,6 @@ class SheetButton extends StatelessWidget {
     required this.onPressed,
     this.loading = false,
   });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback? onPressed;
-  final bool loading;
 
   @override
   Widget build(BuildContext context) {

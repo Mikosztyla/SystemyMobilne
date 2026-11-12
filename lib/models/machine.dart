@@ -58,11 +58,10 @@ class Machine {
 }
 
 abstract final class MachineFields {
-  static const collection = 'machines';
-  static const name = 'name';
-  static const place = 'place';
-  static const qrCode = 'qrCode';
-  static const priceGrosze = 'priceGrosze';
-  static const outOfOrder = 'outOfOrder';
-  static const currentSession = 'currentSession';
+  static const name = "name";
+  static const place = "place";
+  static const qrCode = "qrCode";
+  static const priceGrosze = "priceGrosze";
+  static const outOfOrder = "outOfOrder";
+  static const currentSession = "currentSession";
 }

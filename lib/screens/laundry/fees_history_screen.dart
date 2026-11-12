@@ -1,23 +1,24 @@
 import 'package:bursa_app/models/laundry_session.dart';
 import 'package:bursa_app/screens/laundry/fees_card.dart';
-import 'package:bursa_app/screens/laundry/laundry_colors.dart';
 import 'package:bursa_app/screens/laundry/laundry_format.dart';
+import 'package:bursa_app/services/laundry_fees.dart';
 import 'package:bursa_app/services/laundry_store.dart';
+import 'package:bursa_app/widgets/settings_group.dart';
 import 'package:material_ui/material_ui.dart';
 
 class FeesHistoryScreen extends StatelessWidget {
-  const FeesHistoryScreen({super.key, required this.store});
-
   final LaundryStore store;
+
+  const FeesHistoryScreen({super.key, required this.store});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Moje opłaty')),
+      appBar: AppBar(title: const Text("Moje opłaty")),
       body: ListenableBuilder(
         listenable: store,
         builder: (context, _) {
-          final months = store.sessionsByMonth;
+          final months = LaundryFees.byMonth(store.mySessions);
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
             children: [
@@ -26,7 +27,7 @@ class FeesHistoryScreen extends StatelessWidget {
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 24),
                   child: Text(
-                    'Nie masz jeszcze żadnych prań.',
+                    "Nie masz jeszcze żadnych prań.",
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -34,10 +35,15 @@ class FeesHistoryScreen extends StatelessWidget {
                 const SizedBox(height: 20),
                 _MonthHeader(
                   month: entry.key,
-                  totalGrosze: store.totalGrosze(entry.value),
+                  totalGrosze: LaundryFees.totalGrosze(entry.value),
                 ),
                 const SizedBox(height: 8),
-                _SessionList(sessions: entry.value),
+                SettingsGroup(
+                  children: [
+                    for (final session in entry.value)
+                      _SessionTile(session: session),
+                  ],
+                ),
               ],
             ],
           );
@@ -48,23 +54,27 @@ class FeesHistoryScreen extends StatelessWidget {
 }
 
 class _MonthHeader extends StatelessWidget {
-  const _MonthHeader({required this.month, required this.totalGrosze});
-
   final DateTime month;
   final int totalGrosze;
 
+  const _MonthHeader({required this.month, required this.totalGrosze});
+
   @override
   Widget build(BuildContext context) {
-    const style = TextStyle(
-      fontSize: 12,
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final style = textTheme.labelMedium?.copyWith(
       fontWeight: FontWeight.w700,
-      color: LaundryColors.muted,
-      letterSpacing: 0.5,
+      color: colorScheme.onSurfaceVariant,
     );
+
     return Row(
       children: [
         Expanded(
-          child: Text(LaundryFormat.monthYear(month).toUpperCase(), style: style),
+          child: Text(
+            LaundryFormat.monthYear(month).toUpperCase(),
+            style: style,
+          ),
         ),
         Text(LaundryFormat.money(totalGrosze), style: style),
       ],
@@ -72,39 +82,29 @@ class _MonthHeader extends StatelessWidget {
   }
 }
 
-class _SessionList extends StatelessWidget {
-  const _SessionList({required this.sessions});
+class _SessionTile extends StatelessWidget {
+  final LaundrySession session;
 
-  final List<LaundrySession> sessions;
+  const _SessionTile({required this.session});
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: LaundryColors.card,
-      clipBehavior: Clip.antiAlias,
-      borderRadius: BorderRadius.circular(16),
-      child: Column(
-        children: [
-          for (var i = 0; i < sessions.length; i++) ...[
-            if (i != 0) const Divider(height: 1),
-            ListTile(
-              leading: const Icon(Icons.local_laundry_service),
-              title: Text(
-                sessions[i].machineName,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-              subtitle: Text(
-                '${LaundryFormat.shortDate(sessions[i].startedAt)}, '
-                '${LaundryFormat.time(sessions[i].startedAt)} · '
-                '${LaundryFormat.duration(sessions[i].durationMinutes)}',
-              ),
-              trailing: Text(
-                LaundryFormat.money(sessions[i].costGrosze),
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
-              ),
-            ),
-          ],
-        ],
+    final textTheme = Theme.of(context).textTheme;
+
+    return ListTile(
+      leading: const Icon(Icons.local_laundry_service),
+      title: Text(
+        session.machineName,
+        style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+      ),
+      subtitle: Text(
+        "${LaundryFormat.shortDate(session.startedAt)}, "
+        "${LaundryFormat.time(session.startedAt)} · "
+        "${LaundryFormat.duration(session.durationMinutes)}",
+      ),
+      trailing: Text(
+        LaundryFormat.money(session.costGrosze),
+        style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
       ),
     );
   }

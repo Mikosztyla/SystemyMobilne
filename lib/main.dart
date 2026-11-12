@@ -24,7 +24,7 @@ class BursaApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Bursa',
+      title: "Bursa",
       theme: AppTheme.light(),
       home: isLoggedIn ? const HomeShell() : const LoginScreen(),
     );

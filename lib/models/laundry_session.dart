@@ -27,9 +27,9 @@ class LaundrySession {
     return LaundrySession(
       id: id,
       machineId: data[LaundrySessionFields.machineId] as String,
-      machineName: data[LaundrySessionFields.machineName] as String? ?? '',
+      machineName: data[LaundrySessionFields.machineName] as String? ?? "",
       userId: data[LaundrySessionFields.userId] as String,
-      userName: data[LaundrySessionFields.userName] as String? ?? '',
+      userName: data[LaundrySessionFields.userName] as String? ?? "",
       startedAt: (data[LaundrySessionFields.startedAt] as Timestamp).toDate(),
       durationMinutes: (data[LaundrySessionFields.durationMinutes] as num)
           .toInt(),
@@ -53,13 +53,12 @@ class LaundrySession {
 }
 
 abstract final class LaundrySessionFields {
-  static const collection = 'laundrySessions';
-  static const machineId = 'machineId';
-  static const machineName = 'machineName';
-  static const userId = 'userId';
-  static const userName = 'userName';
-  static const startedAt = 'startedAt';
-  static const durationMinutes = 'durationMinutes';
-  static const finishedAt = 'finishedAt';
-  static const costGrosze = 'costGrosze';
+  static const machineId = "machineId";
+  static const machineName = "machineName";
+  static const userId = "userId";
+  static const userName = "userName";
+  static const startedAt = "startedAt";
+  static const durationMinutes = "durationMinutes";
+  static const finishedAt = "finishedAt";
+  static const costGrosze = "costGrosze";
 }

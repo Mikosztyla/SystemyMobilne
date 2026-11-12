@@ -50,9 +50,9 @@ class CurrentSession {
 }
 
 abstract final class CurrentSessionFields {
-  static const sessionId = 'sessionId';
-  static const userId = 'userId';
-  static const userName = 'userName';
-  static const startedAt = 'startedAt';
-  static const durationMinutes = 'durationMinutes';
+  static const sessionId = "sessionId";
+  static const userId = "userId";
+  static const userName = "userName";
+  static const startedAt = "startedAt";
+  static const durationMinutes = "durationMinutes";
 }

@@ -15,9 +15,9 @@ class LaundryNotifications {
 
   static const _details = NotificationDetails(
     android: AndroidNotificationDetails(
-      'laundry',
-      'Pranie',
-      channelDescription: 'Przypomnienia o końcu prania',
+      "laundry",
+      "Pranie",
+      channelDescription: "Przypomnienia o końcu prania",
       importance: Importance.high,
       priority: Priority.high,
       enableVibration: true,
@@ -35,7 +35,7 @@ class LaundryNotifications {
   Future<void> sync(Map<String, WashReminder> washes, {required bool enabled}) {
     final wanted = enabled ? Map.of(washes) : <String, WashReminder>{};
     _queue = _queue.then((_) => _sync(wanted)).catchError((Object e) {
-      debugPrint('LaundryNotifications: $e');
+      debugPrint("LaundryNotifications: $e");
     });
     return _queue;
   }
@@ -56,8 +56,8 @@ class LaundryNotifications {
     await _schedule(
       id: _freeMachineId,
       at: at,
-      title: 'Pralka się zwolniła',
-      body: '$machineName jest wolna – możesz zacząć pranie.',
+      title: "Pralka się zwolniła",
+      body: "$machineName jest wolna – możesz zacząć pranie.",
     );
   });
 
@@ -66,8 +66,8 @@ class LaundryNotifications {
     await _plugin.cancel(id: _freeMachineId);
     await _plugin.show(
       id: _freeMachineId,
-      title: 'Pralka się zwolniła',
-      body: '$machineName jest wolna – możesz zacząć pranie.',
+      title: "Pralka się zwolniła",
+      body: "$machineName jest wolna – możesz zacząć pranie.",
       notificationDetails: _details,
     );
   });
@@ -86,7 +86,7 @@ class LaundryNotifications {
 
   Future<void> _enqueue(Future<void> Function() action) {
     _queue = _queue.then((_) => action()).catchError((Object e) {
-      debugPrint('LaundryNotifications: $e');
+      debugPrint("LaundryNotifications: $e");
     });
     return _queue;
   }
@@ -114,14 +114,14 @@ class LaundryNotifications {
       await _schedule(
         id: ids.warning,
         at: wash.endsAt.subtract(warningBefore),
-        title: 'Za 5 minut koniec prania',
-        body: '${wash.machineName} – przygotuj się do odebrania prania.',
+        title: "Za 5 minut koniec prania",
+        body: "${wash.machineName} – przygotuj się do odebrania prania.",
       );
       await _schedule(
         id: ids.end,
         at: wash.endsAt,
-        title: 'Pranie skończone',
-        body: '${wash.machineName} – możesz odebrać pranie.',
+        title: "Pranie skończone",
+        body: "${wash.machineName} – możesz odebrać pranie.",
       );
       _scheduled[sessionId] = wash.endsAt;
     }
@@ -131,7 +131,7 @@ class LaundryNotifications {
     if (_initialized) return;
     await _plugin.initialize(
       settings: const InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        android: AndroidInitializationSettings("@mipmap/ic_launcher"),
         iOS: DarwinInitializationSettings(
           requestAlertPermission: false,
           requestBadgePermission: false,

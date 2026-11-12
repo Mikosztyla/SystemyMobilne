@@ -2,9 +2,8 @@ import 'package:bursa_app/screens/duties_screen.dart';
 import 'package:bursa_app/screens/event_screen.dart';
 import 'package:bursa_app/screens/laundry_screen.dart';
 import 'package:bursa_app/screens/profile/profile_screen.dart';
-import 'package:material_ui/material_ui.dart';
-
 import 'package:bursa_app/services/laundry_store.dart';
+import 'package:material_ui/material_ui.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});

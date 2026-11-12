@@ -1,6 +1,11 @@
 import 'package:material_ui/material_ui.dart';
 
 class NoticeBox extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final Color background;
+  final Color foreground;
+
   const NoticeBox({
     super.key,
     required this.icon,
@@ -9,13 +14,10 @@ class NoticeBox extends StatelessWidget {
     required this.foreground,
   });
 
-  final IconData icon;
-  final String text;
-  final Color background;
-  final Color foreground;
-
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -28,7 +30,10 @@ class NoticeBox extends StatelessWidget {
           Icon(icon, color: foreground),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(text, style: TextStyle(fontSize: 14, color: foreground)),
+            child: Text(
+              text,
+              style: textTheme.bodyMedium?.copyWith(color: foreground),
+            ),
           ),
         ],
       ),

@@ -1,6 +1,11 @@
 import 'package:material_ui/material_ui.dart';
 
 class MachineIcon extends StatelessWidget {
+  final Color background;
+  final Color foreground;
+  final double size;
+  final IconData icon;
+
   const MachineIcon({
     super.key,
     required this.background,
@@ -8,11 +13,6 @@ class MachineIcon extends StatelessWidget {
     this.size = 44,
     this.icon = Icons.local_laundry_service,
   });
-
-  final Color background;
-  final Color foreground;
-  final double size;
-  final IconData icon;
 
   @override
   Widget build(BuildContext context) {
