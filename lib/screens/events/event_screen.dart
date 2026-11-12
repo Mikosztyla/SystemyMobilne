@@ -23,6 +23,8 @@ class _EventScreenState extends State<EventScreen> {
   DateTime _weekStart = startOfWeek(DateTime.now());
   late Stream<List<Event>> _eventsStream;
   late final Timer _refreshTimer;
+  final _todayKey = GlobalKey();
+  bool _didAutoScroll = false;
 
   @override
   void initState() {
@@ -47,14 +49,8 @@ class _EventScreenState extends State<EventScreen> {
         children: [
           SizedBox(height: 8),
           WeekPanel(
-            leftClick: () => setState(() {
-              _weekStart = addDays(_weekStart, -7);
-              _eventsStream = _loadEvents();
-            }),
-            rightClick: () => setState(() {
-              _weekStart = addDays(_weekStart, 7);
-              _eventsStream = _loadEvents();
-            }),
+            leftClick: () => _changeWeek(-7),
+            rightClick: () => _changeWeek(7),
             startDate: _weekStart,
           ),
           Expanded(
@@ -73,17 +69,34 @@ class _EventScreenState extends State<EventScreen> {
                 }
 
                 if (snapshot.data!.isEmpty) {
-                  return  EmptyWeekView();
-
+                  return EmptyWeekView();
                 }
+
                 final events = _mapEventList(snapshot.data!);
+                final scrollTarget = _scrollTargetDay(events);
+
+                if (!_didAutoScroll && scrollTarget != null) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    final ctx = _todayKey.currentContext;
+                    if (ctx != null) {
+                      Scrollable.ensureVisible(
+                        ctx,
+                        duration: const Duration(milliseconds: 600),
+                      );
+                    }
+                  });
+                  _didAutoScroll = true;
+                }
 
                 return ListView(
                   padding: EdgeInsets.all(16),
                   children: [
                     for (var i = 0; i < 7; i++)
                       if (events[i].isNotEmpty) ...[
-                        DayHeader(date: addDays(_weekStart, i)),
+                        DayHeader(
+                          key: i == scrollTarget ? _todayKey : null,
+                          date: addDays(_weekStart, i),
+                        ),
                         SizedBox(height: 8),
                         for (final e in events[i]) ...[
                           EventTile(event: e),
@@ -127,5 +140,23 @@ class _EventScreenState extends State<EventScreen> {
       days[event.start.weekday - 1].add(event);
     }
     return days;
+  }
+
+  void _changeWeek(int days){
+    setState(() {
+      _weekStart = addDays(_weekStart, days);
+      _eventsStream = _loadEvents();
+      _didAutoScroll = false;
+    });
+  }
+
+  int? _scrollTargetDay(List<List<Event>> days) {
+    if (_weekStart != startOfWeek(DateTime.now())) return null;
+
+    final todayIndex = DateTime.now().weekday - 1;
+    for (var i = todayIndex; i < 7; i++) {
+      if (days[i].isNotEmpty) return i;
+    }
+    return null;
   }
 }
