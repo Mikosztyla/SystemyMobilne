@@ -1,17 +1,151 @@
+import 'package:bursa_app/models/machine.dart';
+import 'package:bursa_app/screens/laundry/fees_card.dart';
+import 'package:bursa_app/screens/laundry/fees_history_screen.dart';
+import 'package:bursa_app/screens/laundry/free_machine_alert_card.dart';
+import 'package:bursa_app/screens/laundry/laundry_format.dart';
+import 'package:bursa_app/screens/laundry/machine_card.dart';
+import 'package:bursa_app/screens/laundry/scanner/qr_scan_screen.dart';
+import 'package:bursa_app/screens/laundry/section_header.dart';
+import 'package:bursa_app/screens/laundry/sheets/my_wash_sheet.dart';
+import 'package:bursa_app/services/laundry_store.dart';
 import 'package:material_ui/material_ui.dart';
 
-class LaundryScreen extends StatelessWidget{
-  const LaundryScreen({super.key});
+class LaundryScreen extends StatelessWidget {
+  final LaundryStore store;
+
+  const LaundryScreen({super.key, required this.store});
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Pralnia"),
+      appBar: AppBar(title: const Text("Pralnia")),
+      body: ListenableBuilder(
+        listenable: store,
+        builder: (context, _) {
+          if (!store.isReady) {
+            return Center(
+              child: store.error != null
+                  ? Text(store.error!)
+                  : const CircularProgressIndicator(),
+            );
+          }
+
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+            children: [
+              _ScanButton(onPressed: () => _scan(context)),
+              const SizedBox(height: 20),
+              ..._buildMachines(context),
+              const SizedBox(height: 14),
+              ..._buildFees(context),
+            ],
+          );
+        },
       ),
-      body: const Center(child: Text("pralnia"),),
     );
   }
 
+  List<Widget> _buildMachines(BuildContext context) {
+    final now = store.now;
+    return [
+      SectionHeader(
+        title: "Pralki",
+        trailing:
+            "Wolne: ${store.freeCount} z ${store.machines.length} · ${LaundryFormat.time(now)}",
+      ),
+      const SizedBox(height: 8),
+      if (store.allMachinesBusy || store.isWaitingForFreeMachine) ...[
+        FreeMachineAlertCard(store: store),
+        const SizedBox(height: 10),
+      ],
+      if (store.machines.isEmpty)
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 16),
+          child: Text("Nie ma jeszcze żadnych pralek."),
+        ),
+      for (final machine in store.machines) ...[
+        MachineCard(
+          machine: machine,
+          now: now,
+          isMine: machine.isUsedBy(store.uid, now),
+          onTap: machine.isUsedBy(store.uid, now)
+              ? () => _openMyWash(context, machine)
+              : null,
+        ),
+        const SizedBox(height: 10),
+      ],
+    ];
+  }
+
+  List<Widget> _buildFees(BuildContext context) {
+    return [
+      SectionHeader(
+        title: "Moje opłaty",
+        trailing: LaundryFormat.monthYear(store.now),
+      ),
+      const SizedBox(height: 8),
+      FeesCard(
+        store: store,
+        onOpenHistory: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => FeesHistoryScreen(store: store)),
+        ),
+      ),
+    ];
+  }
+
+  Future<void> _scan(BuildContext context) async {
+    final message = await Navigator.of(context).push<String>(
+      MaterialPageRoute(builder: (_) => QrScanScreen(store: store)),
+    );
+    if (message != null && context.mounted) _showMessage(context, message);
+  }
+
+  Future<void> _openMyWash(BuildContext context, Machine machine) async {
+    final message = await showMyWashSheet(
+      context,
+      store: store,
+      machine: machine,
+    );
+    if (message != null && context.mounted) _showMessage(context, message);
+  }
+
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+}
+
+class _ScanButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _ScanButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return SizedBox(
+      height: 64,
+      child: FilledButton(
+        onPressed: onPressed,
+        style: FilledButton.styleFrom(shape: const StadiumBorder()),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.qr_code_scanner, size: 28),
+            const SizedBox(width: 12),
+            Text(
+              "Skanuj pralkę",
+              style: textTheme.titleMedium?.copyWith(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
