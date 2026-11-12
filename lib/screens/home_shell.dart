@@ -4,6 +4,8 @@ import 'package:bursa_app/screens/laundry_screen.dart';
 import 'package:bursa_app/screens/profile_screen.dart';
 import 'package:material_ui/material_ui.dart';
 
+import 'package:bursa_app/services/laundry_store.dart';
+
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
 
@@ -13,6 +15,19 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   int _currentPageIdx = 0;
+  final LaundryStore _laundryStore = LaundryStore();
+
+  @override
+  void initState() {
+    super.initState();
+    _laundryStore.start();
+  }
+
+  @override
+  void dispose() {
+    _laundryStore.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +66,7 @@ class _HomeShellState extends State<HomeShell> {
         children: [
           EventScreen(),
           DutiesScreen(),
-          LaundryScreen(),
+          LaundryScreen(store: _laundryStore),
           ProfileScreen(),
         ],
       ),

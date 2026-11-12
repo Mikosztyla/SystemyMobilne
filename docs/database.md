@@ -43,11 +43,10 @@ erDiagram
         bool isDone
     }
     machines {
-        string id PK "auto-id"
+        string id PK "UUID v4"
         string name
         string place
         string qrCode "zawartosc naklejki QR"
-        int cycleMinutes
         int priceGrosze
         bool outOfOrder
         map currentSession "null = wolna"
@@ -57,9 +56,10 @@ erDiagram
         string machineId FK "machines"
         string userId FK "users"
         string userName "kopia z users"
+        string machineName "kopia z machines"
         timestamp startedAt
-        timestamp endsAt
-        timestamp finishedAt "null = trwa"
+        int durationMinutes "czas programu"
+        timestamp finishedAt "opcjonalne"
         int costGrosze
     }
 ```
@@ -107,17 +107,18 @@ Dyżury przydzielone mieszkańcom.
 | `isDone` | boolean | tak | czy wykonany |
 
 ### `machines/{machineId}`
-Pralki wraz z **aktualnym stanem** (wolna/zajęta).
+Pralki wraz z **aktualnym stanem** (wolna/zajęta). ID dokumentu to **UUID v4** generowany przy dodawaniu pralki.
 
 | Pole | Typ | Wymagane | Opis |
 |---|---|---|---|
 | `name` | string | tak | np. „Pralka 1” |
 | `place` | string | tak | gdzie stoi |
 | `qrCode` | string | tak | tekst zakodowany w naklejce QR (unikalny) |
-| `cycleMinutes` | int64 | tak | długość cyklu prania |
 | `priceGrosze` | int64 | tak | cena za pranie w groszach (500 = 5,00 zł) |
 | `outOfOrder` | boolean | tak | awaria |
-| `currentSession` | map / null | tak | `null` = wolna; w trakcie prania: `{ sessionId, userId, userName, startedAt, endsAt }` |
+| `currentSession` | map / null | tak | `null` = wolna; w trakcie prania: `{ sessionId, userId, userName, startedAt, durationMinutes }` |
+
+Czasu prania nie ma w pralce – zależy od programu wybranego przez użytkownika. Koniec prania aplikacja wylicza sama: `startedAt + durationMinutes`. Pralka jest zajęta, gdy `currentSession != null` i ten czas jeszcze nie minął; po jego upływie jest wolna, nawet jeśli nikt nie kliknął „Zakończ pranie”. Aplikacja właścicielki prania (jeśli jest uruchomiona) dodatkowo sama kończy je w bazie: ustawia `finishedAt` na planowany koniec i czyści `currentSession`.
 
 ### `laundrySessions/{sessionId}`
 Historia prań – podstawa do naliczania opłat. Tworzona przez aplikację przy starcie prania (nie dodawać ręcznie).
@@ -127,7 +128,8 @@ Historia prań – podstawa do naliczania opłat. Tworzona przez aplikację przy
 | `machineId` | string | tak | ID z `machines` |
 | `userId` | string | tak | UID z `users` |
 | `userName` | string | tak | kopia imienia |
+| `machineName` | string | tak | kopia nazwy pralki (do historii prań) |
 | `startedAt` | timestamp | tak | start prania |
-| `endsAt` | timestamp | tak | planowany koniec |
-| `finishedAt` | timestamp / null | tak | faktyczny koniec; `null` = trwa |
+| `durationMinutes` | int64 | tak | czas programu wybrany przez użytkownika |
+| `finishedAt` | timestamp | nie | ustawiane po „Zakończ pranie”; gdy brak, koniec = `startedAt + durationMinutes` |
 | `costGrosze` | int64 | tak | naliczona opłata |
