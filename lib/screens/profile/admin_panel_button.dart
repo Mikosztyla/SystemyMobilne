@@ -3,6 +3,8 @@ import 'package:material_ui/material_ui.dart';
 import 'constants.dart';
 
 class AdminPanelButton extends StatelessWidget{
+  const AdminPanelButton({super.key});
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -15,10 +17,7 @@ class AdminPanelButton extends StatelessWidget{
       child: InkWell(
         onTap: () {}, // TODO
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               Container(

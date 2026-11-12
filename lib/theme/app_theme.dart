@@ -1,6 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'event_colors.dart';
+
 class AppTheme {
   static ThemeData light() {
     final colorScheme = ColorScheme.fromSeed(
@@ -39,6 +41,7 @@ class AppTheme {
 
     return base.copyWith(
       textTheme: textTheme,
+      extensions: const [CategoryColors.light],
       appBarTheme: AppBarTheme(
         titleTextStyle: textTheme.headlineMedium?.copyWith(
           fontSize: 28,

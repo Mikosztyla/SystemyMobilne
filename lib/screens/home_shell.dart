@@ -1,5 +1,5 @@
 import 'package:bursa_app/screens/duties_screen.dart';
-import 'package:bursa_app/screens/event_screen.dart';
+import 'package:bursa_app/screens/events/event_screen.dart';
 import 'package:bursa_app/screens/laundry_screen.dart';
 import 'package:bursa_app/screens/profile/profile_screen.dart';
 import 'package:material_ui/material_ui.dart';
