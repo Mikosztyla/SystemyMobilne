@@ -10,6 +10,7 @@ class AppTheme {
       primaryContainer: Color(0xFFE7DEFF),
       secondaryContainer: Color(0xFFEFE6DA),
       surfaceContainer: Color(0xFFF2ECE5),
+      surfaceContainerLow: Color(0xFFF7F2EC),
     );
 
     final base = ThemeData(
@@ -38,7 +39,12 @@ class AppTheme {
 
     return base.copyWith(
       textTheme: textTheme,
-      appBarTheme: AppBarTheme(titleTextStyle: textTheme.headlineMedium?.copyWith(fontSize: 28, fontWeight: FontWeight.w700)),
+      appBarTheme: AppBarTheme(
+        titleTextStyle: textTheme.headlineMedium?.copyWith(
+          fontSize: 28,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size.fromHeight(52),
