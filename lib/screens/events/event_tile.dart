@@ -1,3 +1,4 @@
+import 'package:bursa_app/screens/events/event_details/event_details.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../models/event.dart';
@@ -29,7 +30,7 @@ class EventTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () {}, // TODO
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => EventDetails(event: event))), // TODO
           child: Padding(
             padding: EdgeInsets.all(16),
             child: Row(
@@ -86,4 +87,5 @@ class EventTile extends StatelessWidget {
       ),
     );
   }
+  
 }

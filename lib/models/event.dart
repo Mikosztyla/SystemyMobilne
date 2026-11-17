@@ -11,6 +11,7 @@ class Event {
   final DateTime? end;
   final String description;
   final EventType type;
+  final String? organizer;
 
   const Event({
     required this.id,
@@ -20,6 +21,7 @@ class Event {
     this.end,
     required this.description,
     required this.type,
+    this.organizer
   });
 
   factory Event.fromMap(Map<String, dynamic> data, String id) {
@@ -33,6 +35,7 @@ class Event {
       type:
       EventType.values.asNameMap()[data[EventFields.type]] ??
           EventType.other,
+      organizer: data[EventFields.organizer] as String?,
     );
   }
 
@@ -57,6 +60,7 @@ abstract final class EventFields {
   static const end = "endAt";
   static const description = "description";
   static const type = "type";
+  static const organizer = "organizer";
 }
 
 enum EventType {
