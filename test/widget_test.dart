@@ -5,6 +5,6 @@ void main() {
   testWidgets('aplikacja się uruchamia', (tester) async {
     await tester.pumpWidget(const BursaApp());
 
-    expect(find.text('Bursa'), findsOneWidget);
+    expect(find.text('BursApp'), findsOneWidget);
   });
 }

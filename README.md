@@ -5,6 +5,9 @@ Proponowany projekt to aplikacja mobilna usprawniająca organizację życia codz
 ## Autorzy
 Mikołaj Gosztyła, Magdalena Pabisz
 
+## Status prac (6.11)
+- Zakładka profilu użytkownika (wyświetlanie danych oraz ustawienia dotyczące powiadomień)
+
 ## Status prac (30.10)
 - Połączenie z bazą danych
 - Mechanizm logowania

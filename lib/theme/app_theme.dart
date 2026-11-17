@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:bursa_app/theme/status_colors.dart';
 
 import 'event_colors.dart';
 
@@ -11,6 +12,7 @@ class AppTheme {
       surface: Color(0xFFFCF8F3),
       primaryContainer: Color(0xFFE7DEFF),
       secondaryContainer: Color(0xFFEFE6DA),
+      onSecondaryContainer: Color(0xFF3A2F22),
       surfaceContainer: Color(0xFFF2ECE5),
       surfaceContainerLow: Color(0xFFF7F2EC),
     );
@@ -41,7 +43,7 @@ class AppTheme {
 
     return base.copyWith(
       textTheme: textTheme,
-      extensions: const [CategoryColors.light],
+      extensions: const [CategoryColors.light, StatusColors.light],
       appBarTheme: AppBarTheme(
         titleTextStyle: textTheme.headlineMedium?.copyWith(
           fontSize: 28,

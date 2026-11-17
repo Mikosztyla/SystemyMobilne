@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pralnia – panel debug</title>
+<style>
+  :root {
+    --bg: #FBF8F4; --card: #F7F2EC; --line: #E4DACD; --text: #2A241D; --muted: #5A534B;
+    --accent: #5B4B8A; --free-bg: #D3EEDC; --free-fg: #1B6E3F; --busy-bg: #DCE6F7; --busy-fg: #2B5C99;
+    --fault-bg: #F9DEDC; --fault-fg: #B3261E; --warn: #FFF1C2;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, "Segoe UI", sans-serif; }
+  header { position: sticky; top: 0; z-index: 2; background: var(--accent); color: #fff; padding: 10px 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  header h1 { font-size: 16px; margin: 0; flex: 1; }
+  header .who { font-size: 13px; opacity: .9; }
+  .banner { background: var(--warn); padding: 6px 16px; font-size: 13px; }
+  main { max-width: 1100px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
+  section { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+  section h2 { font-size: 14px; margin: 0 0 10px; }
+  input, select { font: inherit; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+  input[type=number] { width: 80px; }
+  input[type=checkbox] { width: 16px; height: 16px; }
+  button { font: inherit; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--accent); background: #fff; color: var(--accent); cursor: pointer; white-space: nowrap; }
+  button.primary { background: var(--accent); color: #fff; }
+  button.danger { border-color: var(--fault-fg); color: var(--fault-fg); }
+  button:disabled { opacity: .45; cursor: default; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .machines { display: grid; gap: 12px; }
+  .machine { background: var(--card); border-radius: 14px; padding: 12px; display: grid; gap: 10px; }
+  .machine .top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .machine .id { font: 11px ui-monospace, Consolas, monospace; color: var(--muted); }
+  .chip { padding: 2px 10px; border-radius: 999px; font-weight: 600; font-size: 12px; }
+  .chip.free { background: var(--free-bg); color: var(--free-fg); }
+  .chip.busy { background: var(--busy-bg); color: var(--busy-fg); }
+  .chip.fault { background: var(--fault-bg); color: var(--fault-fg); }
+  .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+  .fields label { display: grid; gap: 2px; font-size: 12px; color: var(--muted); }
+  .fields input[type=text], .fields input[type=number] { width: 100%; }
+  .session { font-size: 13px; background: #fff; border-radius: 10px; padding: 8px 10px; }
+  .session b { font-variant-numeric: tabular-nums; }
+  pre { margin: 0; font: 12px ui-monospace, Consolas, monospace; white-space: pre-wrap; word-break: break-all; }
+  #log { max-height: 180px; overflow: auto; font: 12px ui-monospace, Consolas, monospace; }
+  #log .err { color: var(--fault-fg); }
+  .muted { color: var(--muted); }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Pralnia – panel debug</h1>
+  <span class="who" id="who">niezalogowany</span>
+  <button id="logout" class="hidden">Wyloguj</button>
+</header>
+<div class="banner">Uwaga: każda zmiana trafia do prawdziwej bazy <b>bursaapp-38e6d</b> i od razu widać ją w aplikacji.</div>
+
+<main>
+  <section id="loginBox">
+    <h2>Logowanie (konto admina)</h2>
+    <form id="loginForm" class="row">
+      <input id="email" type="email" placeholder="e-mail" autocomplete="username" required>
+      <input id="password" type="password" placeholder="hasło" autocomplete="current-password" required>
+      <button class="primary">Zaloguj</button>
+    </form>
+  </section>
+
+  <section id="panel" class="hidden">
+    <h2>Scenariusze</h2>
+    <div class="row">
+      <span>Pranie kończy się za</span>
+      <input id="mins" type="number" min="0.1" step="0.5" value="5"> <span>min</span>
+      <label class="row"><input id="asMe" type="checkbox"> jako ja (tworzy wpis w laundrySessions)</label>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button id="occupyAll">Zajmij wszystkie wolne</button>
+      <button id="freeAll">Zwolnij wszystkie</button>
+      <button id="fixAll">Usuń wszystkie awarie</button>
+      <span class="muted" id="summary"></span>
+    </div>
+  </section>
+
+  <section id="machinesBox" class="hidden">
+    <div class="row" style="justify-content:space-between">
+      <h2>Pralki (na żywo)</h2>
+      <label class="row muted"><input id="showRaw" type="checkbox"> pokaż surowe dane</label>
+    </div>
+    <div class="machines" id="machines"></div>
+  </section>
+
+  <section id="addBox" class="hidden">
+    <h2>Dodaj pralkę</h2>
+    <form id="addForm" class="fields">
+      <label>Nazwa<input name="name" type="text" required placeholder="Pralka 6"></label>
+      <label>Miejsce<input name="place" type="text" required placeholder="Piwnica"></label>
+      <label>Kod QR<input name="qrCode" type="text" required placeholder="PR-06"></label>
+      <label>Cena (gr)<input name="priceGrosze" type="number" value="500" min="0"></label>
+      <label>&nbsp;<button class="primary">Dodaj (ID = UUID)</button></label>
+    </form>
+  </section>
+
+  <section>
+    <h2>Log</h2>
+    <div id="log"></div>
+  </section>
+</main>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js';
+import {
+  getFirestore, collection, doc, onSnapshot, updateDoc, setDoc, deleteDoc, getDoc, writeBatch, Timestamp,
+} from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyAxihmE47x_Pv6Vu1IkCZQarK--pC1OnTg',
+  authDomain: 'bursaapp-38e6d.firebaseapp.com',
+  projectId: 'bursaapp-38e6d',
+  storageBucket: 'bursaapp-38e6d.firebasestorage.app',
+  messagingSenderId: '859493469284',
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const DEBUG_USER = { id: 'debug-panel', name: 'Panel debug' };
+const $ = (id) => document.getElementById(id);
+let machines = [];
+let unsubscribe = null;
+let me = null;
+
+function log(message, isError = false) {
+  const line = document.createElement('div');
+  line.className = isError ? 'err' : '';
+  line.textContent = `${new Date().toLocaleTimeString('pl-PL')}  ${message}`;
+  $('log').prepend(line);
+}
+
+async function run(label, action) {
+  try {
+    await action();
+    log(`✔ ${label}`);
+  } catch (e) {
+    log(`✘ ${label}: ${e.code ?? ''} ${e.message}`, true);
+  }
+}
+
+const pad = (n) => String(n).padStart(2, '0');
+const hhmm = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+const countdown = (ms) => {
+  const s = Math.max(0, Math.round(ms / 1000));
+  return `${Math.floor(s / 60)}:${pad(s % 60)}`;
+};
+
+function sessionOf(m) {
+  const s = m.currentSession;
+  if (!s || !s.startedAt) return null;
+  const startedAt = s.startedAt.toDate();
+  const endsAt = new Date(startedAt.getTime() + (s.durationMinutes ?? 0) * 60000);
+  return { ...s, startedAt, endsAt };
+}
+
+function statusOf(m, now = new Date()) {
+  if (m.outOfOrder) return 'fault';
+  const s = sessionOf(m);
+  return s && s.endsAt > now ? 'busy' : 'free';
+}
+
+/** Sesja kończąca się za `minutes` minut (durationMinutes musi być całkowite). */
+function sessionEndingIn(minutes, user) {
+  const remainingMs = minutes * 60000;
+  const durationMinutes = Math.max(1, Math.ceil(minutes));
+  const startedAt = new Date(Date.now() + remainingMs - durationMinutes * 60000);
+  return {
+    sessionId: (user.id === DEBUG_USER.id ? 'debug-' : '') + crypto.randomUUID(),
+    userId: user.id,
+    userName: user.name,
+    startedAt: Timestamp.fromDate(startedAt),
+    durationMinutes,
+  };
+}
+
+async function occupy(m, minutes) {
+  const asMe = $('asMe').checked && me;
+  const user = asMe ? { id: me.uid, name: me.name } : DEBUG_USER;
+  const session = sessionEndingIn(minutes, user);
+  if (asMe) {
+    await setDoc(doc(db, 'laundrySessions', session.sessionId), {
+      machineId: m.id,
+      machineName: m.name,
+      userId: session.userId,
+      userName: session.userName,
+      startedAt: session.startedAt,
+      durationMinutes: session.durationMinutes,
+      costGrosze: m.priceGrosze ?? 0,
+    });
+  }
+  await updateDoc(doc(db, 'machines', m.id), { currentSession: session });
+}
+
+async function free(m) {
+  const s = m.currentSession;
+  if (s && me && s.userId === me.uid) {
+    await updateDoc(doc(db, 'laundrySessions', s.sessionId), { finishedAt: Timestamp.now() })
+      .catch((e) => log(`laundrySessions/${s.sessionId}: ${e.message}`, true));
+  }
+  await updateDoc(doc(db, 'machines', m.id), { currentSession: null });
+}
+
+async function shift(m, minutes) {
+  const s = m.currentSession;
+  const startedAt = new Date(s.startedAt.toDate().getTime() + minutes * 60000);
+  await updateDoc(doc(db, 'machines', m.id), { 'currentSession.startedAt': Timestamp.fromDate(startedAt) });
+}
+
+function el(tag, props = {}, children = []) {
+  const node = Object.assign(document.createElement(tag), props);
+  node.append(...children);
+  return node;
+}
+
+function button(text, onClick, className = '') {
+  return el('button', { textContent: text, className, onclick: onClick });
+}
+
+function field(label, input) {
+  return el('label', {}, [label, input]);
+}
+
+function renderMachines() {
+  const box = $('machines');
+  const focusedId = document.activeElement?.dataset?.key;
+  box.replaceChildren(...machines.map(renderMachine));
+  if (focusedId) box.querySelector(`[data-key="${focusedId}"]`)?.focus();
+  renderLive();
+}
+
+function renderMachine(m) {
+  const name = el('input', { type: 'text', value: m.name ?? '' });
+  const place = el('input', { type: 'text', value: m.place ?? '' });
+  const qr = el('input', { type: 'text', value: m.qrCode ?? '' });
+  const price = el('input', { type: 'number', value: m.priceGrosze ?? 0, min: 0 });
+  const fault = el('input', { type: 'checkbox', checked: !!m.outOfOrder });
+  [name, place, qr, price].forEach((input, i) => { input.dataset.key = `${m.id}-${i}`; });
+
+  fault.onchange = () => run(`${m.name}: outOfOrder = ${fault.checked}`,
+    () => updateDoc(doc(db, 'machines', m.id), { outOfOrder: fault.checked }));
+
+  const save = button('Zapisz pola', () => run(`${m.name}: zapis pól`, () => updateDoc(doc(db, 'machines', m.id), {
+    name: name.value.trim(),
+    place: place.value.trim(),
+    qrCode: qr.value.trim(),
+    priceGrosze: Number(price.value) || 0,
+  })), 'primary');
+
+  const s = sessionOf(m);
+  const sessionBox = el('div', { className: 'session' });
+  if (s) {
+    sessionBox.append(
+      el('span', { innerHTML: `Pranie: <b>${s.userName ?? '?'}</b> <span class="muted">(${s.userId})</span> · start ${hhmm(s.startedAt)} · ${s.durationMinutes} min · koniec <b>${hhmm(s.endsAt)}</b> · zostało <b data-countdown="${s.endsAt.getTime()}"></b>` }),
+    );
+  } else {
+    sessionBox.append(el('span', { className: 'muted', textContent: 'currentSession = null' }));
+  }
+
+  const actions = el('div', { className: 'row' }, [
+    button('Zajmij (czas z góry)', () => run(`${m.name}: zajęta na ${$('mins').value} min`, () => occupy(m, Number($('mins').value) || 1))),
+    button('Kończ za 10 s', () => run(`${m.name}: kończy za 10 s`, () => occupy(m, 10 / 60))),
+    button('Zwolnij', () => run(`${m.name}: zwolniona`, () => free(m))),
+    button('−5 min', () => run(`${m.name}: koniec −5 min`, () => shift(m, -5))),
+    button('+5 min', () => run(`${m.name}: koniec +5 min`, () => shift(m, 5))),
+    save,
+    button('Usuń pralkę', () => {
+      if (confirm(`Usunąć „${m.name}” z bazy? Tego nie da się cofnąć.`)) {
+        run(`${m.name}: usunięta`, () => deleteDoc(doc(db, 'machines', m.id)));
+      }
+    }, 'danger'),
+  ]);
+  actions.querySelectorAll('button').forEach((b) => {
+    if (['Zwolnij', '−5 min', '+5 min'].includes(b.textContent)) b.disabled = !m.currentSession;
+  });
+
+  const chip = el('span', { className: 'chip' });
+  chip.dataset.status = m.id;
+
+  const raw = el('pre', { className: $('showRaw').checked ? '' : 'hidden', textContent: JSON.stringify(m, null, 2) });
+
+  return el('div', { className: 'machine' }, [
+    el('div', { className: 'top' }, [
+      el('strong', { textContent: m.name ?? '(bez nazwy)' }),
+      chip,
+      el('span', { className: 'id', textContent: m.id }),
+      el('label', { className: 'row muted' }, [fault, 'awaria']),
+    ]),
+    el('div', { className: 'fields' }, [
+      field('Nazwa', name), field('Miejsce', place), field('Kod QR', qr), field('Cena (gr)', price),
+    ]),
+    sessionBox,
+    actions,
+    raw,
+  ]);
+}
+
+/** Co sekundę: chipy statusu i odliczanie (bez przebudowy formularzy). */
+function renderLive() {
+  const now = new Date();
+  const labels = { free: 'Wolna', busy: 'Zajęta', fault: 'Awaria' };
+  const classes = { free: 'free', busy: 'busy', fault: 'fault' };
+  for (const m of machines) {
+    const chip = document.querySelector(`[data-status="${m.id}"]`);
+    if (!chip) continue;
+    const st = statusOf(m, now);
+    chip.className = `chip ${classes[st]}`;
+    chip.textContent = st === 'busy' ? `Zajęta do ${hhmm(sessionOf(m).endsAt).slice(0, 5)}` : labels[st];
+  }
+  document.querySelectorAll('[data-countdown]').forEach((b) => {
+    b.textContent = countdown(Number(b.dataset.countdown) - now.getTime());
+  });
+  const counts = { free: 0, busy: 0, fault: 0 };
+  machines.forEach((m) => counts[statusOf(m, now)]++);
+  $('summary').textContent = `wolne ${counts.free} · zajęte ${counts.busy} · awaria ${counts.fault}`;
+}
+setInterval(renderLive, 1000);
+
+$('showRaw').onchange = renderMachines;
+
+$('occupyAll').onclick = () => run('zajęto wszystkie wolne', async () => {
+  const minutes = Number($('mins').value) || 1;
+  for (const m of machines.filter((x) => statusOf(x) === 'free')) await occupy(m, minutes);
+});
+
+$('freeAll').onclick = () => run('zwolniono wszystkie', async () => {
+  for (const m of machines.filter((x) => x.currentSession)) await free(m);
+});
+
+$('fixAll').onclick = () => run('usunięto awarie', async () => {
+  const batch = writeBatch(db);
+  machines.filter((m) => m.outOfOrder).forEach((m) => batch.update(doc(db, 'machines', m.id), { outOfOrder: false }));
+  await batch.commit();
+});
+
+$('addForm').onsubmit = (e) => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  const id = crypto.randomUUID();
+  run(`dodano ${f.get('name')} (${id})`, async () => {
+    await setDoc(doc(db, 'machines', id), {
+      name: f.get('name').trim(),
+      place: f.get('place').trim(),
+      qrCode: f.get('qrCode').trim(),
+      priceGrosze: Number(f.get('priceGrosze')) || 0,
+      outOfOrder: false,
+      currentSession: null,
+    });
+    e.target.reset();
+  });
+};
+
+$('loginForm').onsubmit = (e) => {
+  e.preventDefault();
+  run('logowanie', () => signInWithEmailAndPassword(auth, $('email').value, $('password').value));
+  $('password').value = '';
+};
+
+$('logout').onclick = () => signOut(auth);
+
+onAuthStateChanged(auth, async (user) => {
+  unsubscribe?.();
+  unsubscribe = null;
+  const loggedIn = !!user;
+  $('loginBox').classList.toggle('hidden', loggedIn);
+  ['panel', 'machinesBox', 'addBox', 'logout'].forEach((id) => $(id).classList.toggle('hidden', !loggedIn));
+  if (!user) {
+    me = null;
+    $('who').textContent = 'niezalogowany';
+    return;
+  }
+
+  const profile = (await getDoc(doc(db, 'users', user.uid)).catch(() => null))?.data() ?? {};
+  const name = [profile.name, profile.surname].filter(Boolean).join(' ') || user.email;
+  me = { uid: user.uid, name };
+  $('who').textContent = `${user.email} · rola: ${profile.role ?? 'brak'}`;
+  if (profile.role !== 'admin') {
+    log('To konto nie ma role = "admin" – reguły pozwolą zmieniać tylko currentSession.', true);
+  }
+
+  unsubscribe = onSnapshot(collection(db, 'machines'), (snap) => {
+    machines = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => (a.name ?? '').localeCompare(b.name ?? '', 'pl', { numeric: true }));
+    renderMachines();
+  }, (e) => log(`machines: ${e.code} ${e.message}`, true));
+});
+</script>
+</body>
+</html>
