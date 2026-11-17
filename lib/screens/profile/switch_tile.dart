@@ -8,7 +8,7 @@ class SwitchTile extends StatelessWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
 
-  const SwitchTile({
+  const SwitchTile({super.key, 
     required this.icon,
     required this.title,
     required this.subtitle,

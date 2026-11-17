@@ -4,7 +4,7 @@ import 'package:material_ui/material_ui.dart';
 class ProfileHeader extends StatelessWidget{
   final AppUser user;
 
-  const ProfileHeader({required this.user});
+  const ProfileHeader({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {

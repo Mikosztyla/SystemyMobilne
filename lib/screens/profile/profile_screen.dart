@@ -20,7 +20,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final Map<String, bool> _notifications = Map();
+  final Map<String, bool> _notifications = {};
   late final Future<AppUser> _userFuture;
 
   @override
