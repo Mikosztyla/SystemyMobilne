@@ -40,8 +40,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         future: _userFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Text(
-              "Loading",
+            return Center(
+              child: CircularProgressIndicator(),
             ); // TODO - co robimy w trakcie ładowania danych?
           }
           if (snapshot.hasError) {
@@ -71,7 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
               SizedBox(height: 16),
-              AdminPanelButton(), //TODO on click
+              if (user.isAdmin) AdminPanelButton(), //TODO on click
               SizedBox(height: 16),
               Text(
                 "POWIADOMIENIA I WYGLĄD",
