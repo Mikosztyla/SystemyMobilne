@@ -1,8 +1,9 @@
+import 'package:bursa_app/screens/admin_panel/admin_screen.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'constants.dart';
 
-class AdminPanelButton extends StatelessWidget{
+class AdminPanelButton extends StatelessWidget {
   const AdminPanelButton({super.key});
 
   @override
@@ -15,7 +16,10 @@ class AdminPanelButton extends StatelessWidget{
       borderRadius: BorderRadius.circular(16),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () {}, // TODO
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AdminScreen()),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(

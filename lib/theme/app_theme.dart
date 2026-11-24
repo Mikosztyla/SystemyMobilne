@@ -1,3 +1,4 @@
+import 'package:bursa_app/theme/admin_colors.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:bursa_app/theme/status_colors.dart';
@@ -43,7 +44,7 @@ class AppTheme {
 
     return base.copyWith(
       textTheme: textTheme,
-      extensions: const [CategoryColors.light, StatusColors.light],
+      extensions: const [EventColors.light, StatusColors.light, AdminColors.light],
       appBarTheme: AppBarTheme(
         titleTextStyle: textTheme.headlineMedium?.copyWith(
           fontSize: 28,

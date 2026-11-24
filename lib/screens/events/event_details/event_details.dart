@@ -17,7 +17,7 @@ class EventDetails extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final eventColors = Theme.of(context)
-        .extension<CategoryColors>()!
+        .extension<EventColors>()!
         .forType(event.type);
 
     final dateString =

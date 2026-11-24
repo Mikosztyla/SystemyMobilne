@@ -2,6 +2,7 @@ import 'package:bursa_app/screens/events/event_details/event_details.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../models/event.dart';
+import '../../theme/color_pair.dart';
 import '../../theme/event_colors.dart';
 import '../utils/date_utils.dart';
 
@@ -17,11 +18,11 @@ class EventTile extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final eventColors = dimmed
-        ? EventColors(
+        ? ColorPair(
             background: colorScheme.surfaceContainerHighest,
             foreground: colorScheme.onSurfaceVariant,
           )
-        : Theme.of(context).extension<CategoryColors>()!.forType(event.type);
+        : Theme.of(context).extension<EventColors>()!.forType(event.type);
 
     return Opacity(
       opacity: dimmed ? 0.6 : 1,
@@ -30,7 +31,10 @@ class EventTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => EventDetails(event: event))), // TODO
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => EventDetails(event: event)),
+          ),
           child: Padding(
             padding: EdgeInsets.all(16),
             child: Row(
@@ -87,5 +91,4 @@ class EventTile extends StatelessWidget {
       ),
     );
   }
-  
 }
