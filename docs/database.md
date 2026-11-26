@@ -103,8 +103,10 @@ Dyżury przydzielone mieszkańcom.
 | `description` | string | nie | szczegóły |
 | `assigneeId` | string | tak | UID osoby z `users` |
 | `assigneeName` | string | tak | imię osoby (kopia, żeby lista nie doczytywała profili) |
+| `floor` | string | tak | piętro osoby (kopia z `users`, do widoku „piętrowe”) |
 | `date` | timestamp | tak | dzień dyżuru |
 | `isDone` | boolean | tak | czy wykonany |
+| `doneAt` | timestamp / null | nie | kiedy zaznaczono wykonanie; może być późniejsze niż `date` (zaznaczenie za wcześniejszy dzień) |
 
 ### `machines/{machineId}`
 Pralki wraz z **aktualnym stanem** (wolna/zajęta). ID dokumentu to **UUID v4** generowany przy dodawaniu pralki.

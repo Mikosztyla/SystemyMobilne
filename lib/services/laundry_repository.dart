@@ -1,5 +1,6 @@
 import 'package:bursa_app/models/app_user.dart';
 import 'package:bursa_app/models/current_session.dart';
+import 'package:bursa_app/models/event.dart';
 import 'package:bursa_app/models/firestore_collections.dart';
 import 'package:bursa_app/models/laundry_session.dart';
 import 'package:bursa_app/models/machine.dart';
@@ -59,19 +60,19 @@ class LaundryRepository {
   Stream<FeeCollection?> watchNextFeeCollection() {
     return _db
         .collection(FirestoreCollections.events)
-        .where("type", isEqualTo: "feeCollection")
+        .where(EventFields.type, isEqualTo: EventType.payment.name)
         .snapshots()
         .map((snapshot) {
           final now = DateTime.now();
           final today = DateTime(now.year, now.month, now.day);
           FeeCollection? next;
           for (final doc in snapshot.docs) {
-            final start = (doc.data()["startAt"] as Timestamp?)?.toDate();
+            final start = (doc.data()[EventFields.start] as Timestamp?)?.toDate();
             if (start == null || start.isBefore(today)) continue;
             if (next == null || start.isBefore(next.start)) {
               next = (
                 start: start,
-                end: (doc.data()["endAt"] as Timestamp?)?.toDate(),
+                end: (doc.data()[EventFields.end] as Timestamp?)?.toDate(),
               );
             }
           }
